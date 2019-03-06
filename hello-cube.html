@@ -73,7 +73,8 @@ function initialize()
 		arToolkitSource.copySizeTo(renderer.domElement)	
 		if ( arToolkitContext.arController !== null )
 		{
-			arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)	
+			arToolkitSource.copySizeTo(arToolkitContext.arController.canvas);
+			
 		}	
 	}
 
@@ -131,6 +132,8 @@ function update()
 	// update artoolkit on every frame
 	if ( arToolkitSource.ready !== false )
 		arToolkitContext.update( arToolkitSource.domElement );
+		console.log('here');
+		mesh1.position.y = 1.2 * (Math.abs(Math.sin(2.00 * totalTime + 0.10)) + 0.5);
 }
 
 
