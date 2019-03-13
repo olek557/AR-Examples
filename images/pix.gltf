@@ -1,0 +1,238 @@
+{
+    "asset" : {
+        "generator" : "Khronos Blender glTF 2.0 I/O",
+        "version" : "2.0"
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "extras" : {
+                "glTF2ExportSettings" : {
+                    "export_format" : "GLTF_SEPARATE",
+                    "export_bake_skins" : 1,
+                    "export_morph_normal" : 0,
+                    "export_all_influences" : 0,
+                    "export_morph_tangent" : 0,
+                    "export_frame_step" : 1,
+                    "export_selected" : 0,
+                    "export_force_sampling" : 1,
+                    "export_morph" : 0,
+                    "export_extras" : 1,
+                    "export_yup" : 1,
+                    "export_apply" : 0,
+                    "export_skins" : 0,
+                    "export_current_frame" : 0
+                }
+            },
+            "nodes" : [
+                0,
+                1,
+                2,
+                3,
+                4
+            ],
+            "name" : "Scene"
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "scale" : [
+                1.887300729751587,
+                1.887300729751587,
+                1.887300729751587
+            ],
+            "translation" : [
+                1.3808364868164062,
+                0.47409147024154663,
+                0.14545342326164246
+            ],
+            "name" : "Plane"
+        },
+        {
+            "translation" : [
+                1.8086715936660767,
+                1.2933510541915894,
+                0.5153416395187378
+            ],
+            "name" : "Field"
+        },
+        {
+            "mesh" : 1,
+            "translation" : [
+                0.08355085551738739,
+                0.8606255054473877,
+                0.44704151153564453
+            ],
+            "rotation" : [
+                0.7071068286895752,
+                0,
+                0,
+                0.7071068286895752
+            ],
+            "name" : "Text"
+        },
+        {
+            "translation" : [
+                1.9009143114089966,
+                2.5389318466186523,
+                5.196660041809082
+            ],
+            "rotation" : [
+                0.16907575726509094,
+                0.7558802962303162,
+                -0.27217137813568115,
+                0.570947527885437
+            ],
+            "name" : "Lamp"
+        },
+        {
+            "translation" : [
+                -1.9787116050720215,
+                2.4114468097686768,
+                8.488636016845703
+            ],
+            "rotation" : [
+                0.6195467114448547,
+                -0.09164824336767197,
+                0.07315625250339508,
+                0.776151180267334
+            ],
+            "name" : "Camera"
+        }
+    ],
+    "materials" : [
+        {
+            "pbrMetallicRoughness" : {},
+            "name" : "Material.002"
+        },
+        {
+            "pbrMetallicRoughness" : {},
+            "name" : "violet"
+        }
+    ],
+    "meshes" : [
+        {
+            "primitives" : [
+                {
+                    "material" : 0,
+                    "indices" : 2,
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1
+                    }
+                }
+            ],
+            "name" : "Plane"
+        },
+        {
+            "primitives" : [
+                {
+                    "material" : 1,
+                    "indices" : 5,
+                    "attributes" : {
+                        "POSITION" : 3,
+                        "NORMAL" : 4
+                    }
+                }
+            ],
+            "name" : "CUText"
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "max" : [
+                1,
+                0,
+                1
+            ],
+            "count" : 4,
+            "componentType" : 5126,
+            "type" : "VEC3",
+            "min" : [
+                -1,
+                0,
+                -1
+            ]
+        },
+        {
+            "bufferView" : 1,
+            "count" : 4,
+            "type" : "VEC3",
+            "componentType" : 5126
+        },
+        {
+            "bufferView" : 2,
+            "count" : 6,
+            "type" : "SCALAR",
+            "componentType" : 5123
+        },
+        {
+            "bufferView" : 3,
+            "max" : [
+                2.6630001068115234,
+                0.10999999940395355,
+                0.24000000953674316
+            ],
+            "count" : 5672,
+            "componentType" : 5126,
+            "type" : "VEC3",
+            "min" : [
+                0.04700000584125519,
+                -0.10999999940395355,
+                -0.6480234861373901
+            ]
+        },
+        {
+            "bufferView" : 4,
+            "count" : 5672,
+            "type" : "VEC3",
+            "componentType" : 5126
+        },
+        {
+            "bufferView" : 5,
+            "count" : 21468,
+            "type" : "SCALAR",
+            "componentType" : 5123
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 48,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 48,
+            "byteOffset" : 48
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 12,
+            "byteOffset" : 96
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 68064,
+            "byteOffset" : 108
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 68064,
+            "byteOffset" : 68172
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 42936,
+            "byteOffset" : 136236
+        }
+    ],
+    "buffers" : [
+        {
+            "uri" : "disolve pix.bin",
+            "byteLength" : 179172
+        }
+    ]
+}
