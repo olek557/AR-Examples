@@ -28,7 +28,11 @@
 	var mesh123;
 	var meshLogo;
 	var fishPos = -120;
-	var markerFound = false;
+	var modelIsLoaded = false;
+	var isMarkerFound = false;
+	var timeAnimation = 0;
+	var texture;
+	var texture1;
 	initialize();
 	animate();
 	function initialize() {
@@ -97,14 +101,20 @@
 	let markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
 		type : 'pattern',
 		patternUrl : "data/hiro.patt",
-	})
+	});
 	markerControls1.addEventListener('markerFound', function (event) {
+			isMarkerFound = true;
 			console.log('marker found');
-		})
+		});
+	markerControls1.addEventListener('markerLost', function (event) {
+			timeAnimation = 0;
+			// isMarkerFound = false;
+			console.log('marker lost');
+		});
 	// the inside of the hole
 	let loader = new THREE.TextureLoader();
-	let texture = loader.load( 'images/ornament-07.png' );
-	let texture1 = loader.load( 'images/ornament-07 copy.png' );
+	texture = loader.load( 'images/ornament-06.png' );
+	texture1 = loader.load( 'images/ornament-06 copy.png' );
 	texture.wrapS = THREE.RepeatWrapping;
 	texture.wrapT = THREE.RepeatWrapping;
 	texture.needsUpdate = true; 
@@ -114,7 +124,7 @@
 	texture.repeat.set(1, 3);
 	texture1.repeat.set(1, 3);
 	
-	let geometry1	= new THREE.CubeGeometry(1,120,1);
+	let geometry1	= new THREE.CubeGeometry(1, 120, 1);
 	
 	let material1	= new THREE.MeshLambertMaterial({
 		transparent : true,
@@ -147,7 +157,7 @@
 	markerRoot1.add( mesh1 );
 	
 	// the invisibility cloak (box with a hole)
-	let geometry0 = new THREE.BoxGeometry(1.03,120,1.03);
+	let geometry0 = new THREE.BoxGeometry(1, 120, 1);
 	geometry0.faces.splice(4, 2);
 	
 	let material0 = new THREE.MeshBasicMaterial({
@@ -160,23 +170,30 @@
 	markerRoot1.add(mesh0);
 
 
-		function onProgress(xhr) { console.log((xhr.loaded / xhr.total * 100) + '% loaded'); }
+		function onProgress(xhr) {
+			if(xhr.loaded / xhr.total * 100 === 100 ) {
+				modelIsLoaded = true;
+				
+			}
+			console.log((xhr.loaded / xhr.total * 100) + '% loaded', xhr.loaded, xhr.total); 
+		}
 		function onError(xhr) { console.log('An error happened'); }
 
 		let logo = new THREE.MTLLoader();
 			logo.setPath('models/')
-			logo.load('disolve pix.mtl', (materials) => {
+			logo.load('disolve pix1.mtl', (materials) => {
 				materials.preload();
 				let logoLoader = new THREE.OBJLoader();
 					logoLoader.setMaterials(materials);
 					logoLoader.setPath('models/');
-					logoLoader.load('disolve pix.obj', (group) => {
+					logoLoader.load('disolve pix1.obj', (group) => {
 						meshLogo = group.children[0];
 						meshLogo.material.side = THREE.DoubleSide;
 						meshLogo.position.y = -60;
-						meshLogo.position.z = 1;
+						meshLogo.position.z = .4;
+						meshLogo.position.x = 0.15;
 						meshLogo.rotation.x = - Math.PI / 2;
-						meshLogo.scale.set(.1, .1, .1);
+						meshLogo.scale.set(0.3, 0.3, 0.3);
 						markerRoot1.add(meshLogo);
 					}, onProgress, onError);
 			});
@@ -188,25 +205,20 @@ function update()
 	// update artoolkit on every frame
 	if ( arToolkitSource.ready !== false )
 		arToolkitContext.update( arToolkitSource.domElement );
-		// mesh1.position.y = 1.2 * (Math.abs(Math.sin(2.00 * totalTime + 0.10)) + 0.5);
-		// console.log(totalTime)
-		if(totalTime) {
-			meshLogo.position.y += .1 * totalTime;
-			// if(meshLogo.position.x === 0) {
-			// }
-			// rybaRender(fishPos);
-			mesh1.material[0].map.offset.y -= .001 * totalTime;
-			mesh1.material[1].map.offset.y -= .001 * totalTime;
-			mesh1.material[2].map.offset.y -= .001 * totalTime;
-			mesh1.material[3].map.offset.y -= .001 * totalTime;
-			// mesh1.material.forEach(materialItem => {
-			// 	// materialItem.map.offset.y -= .001 * totalTime * totalTime;
-			// 	materialItem.map.offset.y -= .00001;
-
-			// });
-			// mesh1.material.map.offset.y -= .001 * totalTime * totalTime;
+		if(timeAnimation <= 10 && modelIsLoaded && isMarkerFound) {
+			if (meshLogo.position.y <= 0) {
+				meshLogo.position.y += .1 * totalTime;
+			mesh1.material[0].map.offset.y -= .01 * totalTime;
+			mesh1.material[1].map.offset.y -= .01 * totalTime;
+			mesh1.material[2].map.offset.y -= .01 * totalTime;
+			mesh1.material[3].map.offset.y -= .01 * totalTime;
+			}
+			// meshLogo.scale.set(.1 * totalTime, .1 * totalTime, .1 * totalTime);
 		}
-		// mesh1.material.map.offset.x -= 0.05;
+	// 	mesh1.material[0].map.offset.y -= .001 * totalTime;
+	// mesh1.material[1].map.offset.y -= .001 * totalTime;
+	// mesh1.material[2].map.offset.y -= .001 * totalTime;
+	// mesh1.material[3].map.offset.y -= .001 * totalTime;
 }
 function render()
 {
@@ -216,6 +228,11 @@ function animate()
 {
 	requestAnimationFrame(animate);
 	deltaTime = clock.getDelta();
+	// console.log(deltaTime)
+	if(isMarkerFound) {
+		timeAnimation += deltaTime;
+	}
+	timeAnimation += deltaTime;
 	totalTime += deltaTime;
 	update();
 	render();
