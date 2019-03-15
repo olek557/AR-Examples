@@ -113,8 +113,8 @@
 		});
 	// the inside of the hole
 	let loader = new THREE.TextureLoader();
-	texture = loader.load( 'images/ornament-06.png' );
-	texture1 = loader.load( 'images/ornament-06 copy.png' );
+	texture = loader.load( 'images/ornament-07.png' );
+	texture1 = loader.load( 'images/ornament-07 copy.png' );
 	texture.wrapS = THREE.RepeatWrapping;
 	texture.wrapT = THREE.RepeatWrapping;
 	texture.needsUpdate = true; 
@@ -208,17 +208,17 @@ function update()
 		if(timeAnimation <= 10 && modelIsLoaded && isMarkerFound) {
 			if (meshLogo.position.y <= 0) {
 				meshLogo.position.y += .1 * totalTime;
-			mesh1.material[0].map.offset.y -= .01 * totalTime;
-			mesh1.material[1].map.offset.y -= .01 * totalTime;
-			mesh1.material[2].map.offset.y -= .01 * totalTime;
-			mesh1.material[3].map.offset.y -= .01 * totalTime;
+			// mesh1.material[0].map.offset.y -= .01 * totalTime;
+			// mesh1.material[1].map.offset.y -= .01 * totalTime;
+			// mesh1.material[2].map.offset.y -= .01 * totalTime;
+			// mesh1.material[3].map.offset.y -= .01 * totalTime;
 			}
 			// meshLogo.scale.set(.1 * totalTime, .1 * totalTime, .1 * totalTime);
 		}
-	// 	mesh1.material[0].map.offset.y -= .001 * totalTime;
-	// mesh1.material[1].map.offset.y -= .001 * totalTime;
-	// mesh1.material[2].map.offset.y -= .001 * totalTime;
-	// mesh1.material[3].map.offset.y -= .001 * totalTime;
+		mesh1.material[0].map.offset.y -= .001 * totalTime;
+	mesh1.material[1].map.offset.y -= .001 * totalTime;
+	mesh1.material[2].map.offset.y -= .001 * totalTime;
+	mesh1.material[3].map.offset.y -= .001 * totalTime;
 }
 function render()
 {
