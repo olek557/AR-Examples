@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<!-- three.js library -->
+<!-- <script src='js/three.js/build/three.min.js'></script> -->
+<!-- <script src="js/three.js/examples/js/libs/stats.min.js"></script> -->
+<!-- ar.js -->
+
+<!-- include three.js library -->
+<script src='js/three.js'></script>
+<script src="js/ar.js"></script>
+<script src='js/OBJLoader.js'></script>
+<script src='js/MTLLoader.js'></script>
+<!-- include jsartookit -->
+<!-- <script src="jsartoolkit5/artoolkit.min.js"></script>
+<script src="jsartoolkit5/artoolkit.api.js"></script> -->
+<!-- <script src='js/OBJLoader.js'></script>
+<script src='js/MTLLoader.js'></script> -->
+<!-- include threex.artoolkit -->
+<!-- <script src="threex/threex-artoolkitsource.js"></script>
+<script src="threex/threex-artoolkitcontext.js"></script>
+<script src="threex/threex-arbasecontrols.js"></script>
+<script src="threex/threex-armarkercontrols.js"></script> -->
+<!-- <script>THREEx.ArToolkitContext.baseURL = '../'</script> -->
+
+<body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
+  <!-- <div style='position: absolute; top: 10px; width:100%; text-align: center; z-index: 1;'>
+    <a href="https://github.com/jeromeetienne/AR.js/" target="_blank">AR.js</a> - three.js mobile performance
+    <br />
+    Contact me any time at <a href='https://twitter.com/jerome_etienne' target='_blank'>@jerome_etienne</a>
+  </div> -->
+  <script>
+    //////////////////////////////////////////////////////////////////////////////////
+    //		Init
+    //////////////////////////////////////////////////////////////////////////////////
+    // init renderer
+    var renderer = new THREE.WebGLRenderer({
+      // antialias	: true,
+      alpha: true
+    });
+    var meshLogo, totalTime, mesh;
+    renderer.setClearColor(new THREE.Color('lightgrey'), 0)
+    // renderer.setPixelRatio( 1/2 );
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.domElement.style.position = 'absolute'
+    renderer.domElement.style.top = '0px'
+    renderer.domElement.style.left = '0px'
+    document.body.appendChild(renderer.domElement);
+    		totalTime = 0;
+    // array of functions for the rendering loop
+    var onRenderFcts = [];
+    // init scene and camera
+    let ambientLight = new THREE.AmbientLight(0xcccccc, 1.0);
+    var scene = new THREE.Scene();
+    scene.add(ambientLight);
+
+    //////////////////////////////////////////////////////////////////////////////////
+    //		Initialize a basic camera
+    //////////////////////////////////////////////////////////////////////////////////
+    // Create a camera
+    var camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 300, 10000);
+    scene.add(camera);
+    ////////////////////////////////////////////////////////////////////////////////
+    //          handle arToolkitSource
+    ////////////////////////////////////////////////////////////////////////////////
+    var arToolkitSource = new THREEx.ArToolkitSource({
+      // to read from the webcam 
+      sourceType: 'webcam',
+      // to read from an image
+      // sourceType : 'image',
+      // sourceUrl : THREEx.ArToolkitContext.baseURL + '../data/images/img.jpg',		
+      // to read from a video
+      // sourceType : 'video',
+      // sourceUrl : THREEx.ArToolkitContext.baseURL + '../data/videos/headtracking.mp4',		
+    })
+    arToolkitSource.init(function onReady() {
+      onResize()
+    })
+
+    // handle resize
+    window.addEventListener('resize', function () {
+      onResize()
+    })
+    function onResize() {
+      arToolkitSource.onResize()
+      arToolkitSource.copySizeTo(renderer.domElement)
+      if (arToolkitContext.arController !== null) {
+        arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)
+      }
+    }
+    ////////////////////////////////////////////////////////////////////////////////
+    //          initialize arToolkitContext
+    ////////////////////////////////////////////////////////////////////////////////
+
+    // create atToolkitContext
+    var arToolkitContext = new THREEx.ArToolkitContext({
+      cameraParametersUrl: 'data/camera_para.dat',
+      detectionMode: 'mono',
+      maxDetectionRate: 30,
+      canvasWidth: 80 * 3,
+      canvasHeight: 60 * 3,
+    })
+    // initialize it
+    arToolkitContext.init(function onCompleted() {
+      // copy projection matrix to camera
+      camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+    })
+    // update artoolkit on every frame
+    onRenderFcts.push(function () {
+      if (arToolkitSource.ready === false) return
+      arToolkitContext.update(arToolkitSource.domElement)
+    })
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //          Create a ArMarkerControls
+    ////////////////////////////////////////////////////////////////////////////////
+
+    var markerRoot = new THREE.Group
+    scene.add(markerRoot)
+    var artoolkitMarker = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+      type: 'pattern',
+      patternUrl: "data/hiro.patt"
+      // THREEx.ArToolkitContext.baseURL + '..data/patt.hiro'
+      // patternUrl : THREEx.ArToolkitContext.baseURL + '../data/data/patt.kanji'
+    })
+    // build a smoothedControls
+    var smoothedRoot = new THREE.Group()
+    scene.add(smoothedRoot)
+    var smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot, {
+      lerpPosition: 0.4,
+      lerpQuaternion: 0.3,
+      lerpScale: 1,
+    })
+    onRenderFcts.push(function (delta) {
+      smoothedControls.update(markerRoot)
+    })
+    //////////////////////////////////////////////////////////////////////////////////
+    //		add an object in the scene
+    //////////////////////////////////////////////////////////////////////////////////
+    var arWorldRoot = smoothedRoot
+    // add a torus knot	
+    var geometry = new THREE.CubeGeometry(1, 40, 1);
+    let loader = new THREE.TextureLoader();
+    texture = loader.load('images/ornament-06.png');
+    texture1 = loader.load('images/ornament-06 copy.png');
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.needsUpdate = true;
+    texture1.wrapS = THREE.RepeatWrapping;
+    texture1.wrapT = THREE.RepeatWrapping;
+    texture1.needsUpdate = true;
+    texture.repeat.set(1, 3);
+    texture1.repeat.set(1, 3);
+      texture3 = loader.load('images/ornament-06 copy.png');
+        texture3.wrapS = THREE.RepeatWrapping;
+          texture3.wrapT = THREE.RepeatWrapping;
+          texture3.needsUpdate = true;
+          texture3.repeat.set(1, 1);
+
+    let material11 = new THREE.MeshLambertMaterial({
+      transparent: true,
+      map: texture,
+      side: THREE.BackSide,
+    });
+    let material12 = new THREE.MeshLambertMaterial({
+      transparent: true,
+      map: texture1,
+      side: THREE.BackSide,
+    });
+
+    	let material3 = new THREE.MeshLambertMaterial({
+        transparent: true,
+        map: texture3,
+        side: THREE.BackSide,
+        }); 
+  var materials = [
+    material12,        // Left side
+    material12,       // Right side
+    material11,         // Top side
+    material11,      // Bottom side
+    material11,       // Front side
+    material11         // Back side
+  ];
+    var mesh = new THREE.Mesh(geometry, materials);
+    // mesh.position.y = geometry.parameters.height / 2
+    mesh.position.y = -20
+    arWorldRoot.add(mesh);
+
+    // var geometry = new THREE.TorusKnotGeometry(0.3, 0.1, 64, 16);
+    // var material = new THREE.MeshNormalMaterial();
+    // var mesh = new THREE.Mesh(geometry, material);
+    // mesh.position.y = -20
+    // arWorldRoot.add(mesh);
+
+    // the invisibility cloak (box with a hole)
+    let geometry0 = new THREE.BoxGeometry(1, 40, 1);
+    geometry0.faces.splice(4, 2);
+
+    let material0 = new THREE.MeshBasicMaterial({
+      colorWrite: false
+    });
+
+    let mesh0 = new THREE.Mesh(geometry0, material0);
+    mesh0.scale.set(1, 1, 1).multiplyScalar(1.01);
+    mesh0.position.y = -20;
+    arWorldRoot.add(mesh0);
+
+
+      function onProgress(xhr) {
+        if (xhr.loaded / xhr.total * 100 === 100) {
+          modelIsLoaded = true;
+
+        }
+        console.log((xhr.loaded / xhr.total * 100) + '% loaded', xhr.loaded, xhr.total);
+      }
+      function onError(xhr) { console.log('An error happened'); }
+    let logo = new THREE.MTLLoader();
+      logo.setPath('models/')
+
+      logo.load('disolve pix1.mtl', (materials) => {
+        materials.preload();
+        let logoLoader = new THREE.OBJLoader();
+        logoLoader.setMaterials(materials);
+        logoLoader.setPath('models/');
+        logoLoader.load('disolve pix1.obj', (group) => {
+          meshLogo = group.children[0];
+          meshLogo.material.side = THREE.DoubleSide;
+          meshLogo.position.y = -1;
+          meshLogo.position.z = 0;
+          meshLogo.position.x = 0;
+          // meshLogo.rotation.x = - Math.PI / 2;
+          meshLogo.scale.set(0.25, 0.25, 0.25);
+          arWorldRoot.add(meshLogo);
+        }, onProgress, onError);
+      });
+        let logoLight = new THREE.PointLight(0xffffff, .3, 600);
+        logoLight.target = meshLogo;
+        scene.add(logoLight);
+        
+    onRenderFcts.push(function () {
+      let delta = 0.01 + (.000001 * totalTime)
+      // meshLogo.rotation.y -= delta
+      meshLogo.rotation.z -= delta
+      meshLogo.rotation.x -= delta
+
+
+          mesh.material[0].map.offset.y -= delta;
+          mesh.material[1].map.offset.y -= delta;
+          mesh.material[2].map.offset.y -= delta;
+          mesh.material[3].map.offset.y -= delta;
+      
+    })
+    //////////////////////////////////////////////////////////////////////////////////
+    //		render the whole thing on the page
+    //////////////////////////////////////////////////////////////////////////////////
+    // var stats = new Stats();
+    // document.body.appendChild(stats.dom);
+    // // render the scene
+    onRenderFcts.push(function () {
+      renderer.render(scene, camera);
+      // stats.update();
+    })
+    // run the rendering loop
+    var lastTimeMsec = null
+    requestAnimationFrame(function animate(nowMsec) {
+      // keep looping
+      requestAnimationFrame(animate);
+      // measure time
+      lastTimeMsec = lastTimeMsec || nowMsec - 1000 / 60
+      var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
+      if(totalTime <= 30000) {
+        totalTime += +deltaMsec;
+      }
+      console.log(totalTime)
+      lastTimeMsec = nowMsec
+      // call each update function
+      onRenderFcts.forEach(function (onRenderFct) {
+        onRenderFct(deltaMsec / 1000, nowMsec / 1000)
+      })
+    })
+  </script>
+</body>
